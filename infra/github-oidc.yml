@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: GitHub Actions OIDC provider and IAM Role for wefin-admin-fe deployment
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Description: GitHub organization or user name
+  GitHubRepo:
+    Type: String
+    Default: wefin-admin-fe
+    Description: GitHub repository name
+  DevBucketName:
+    Type: String
+    Default: wefin-admin-fe-dev
+  ProdBucketName:
+    Type: String
+    Default: wefin-admin-fe-prod
+  DevDistributionId:
+    Type: String
+    Description: CloudFront distribution ID for dev (enter after hosting stack is deployed)
+    Default: ''
+  ProdDistributionId:
+    Type: String
+    Description: CloudFront distribution ID for prod (enter after hosting stack is deployed)
+    Default: ''
+
+Conditions:
+  HasDevDistribution: !Not [!Equals [!Ref DevDistributionId, '']]
+  HasProdDistribution: !Not [!Equals [!Ref ProdDistributionId, '']]
+  HasAnyDistribution: !Or
+    - !Condition HasDevDistribution
+    - !Condition HasProdDistribution
+
+Resources:
+  GitHubOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: wefin-admin-fe-deploy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOIDCProvider
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              StringLike:
+                token.actions.githubusercontent.com:sub:
+                  !Sub repo:${GitHubOrg}/${GitHubRepo}:ref:refs/heads/*
+      Policies:
+        - PolicyName: S3DeployPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: S3Sync
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${DevBucketName}
+                  - !Sub arn:aws:s3:::${DevBucketName}/*
+                  - !Sub arn:aws:s3:::${ProdBucketName}
+                  - !Sub arn:aws:s3:::${ProdBucketName}/*
+        - !If
+          - HasAnyDistribution
+          - PolicyName: CloudFrontInvalidationPolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Sid: CloudFrontInvalidation
+                  Effect: Allow
+                  Action:
+                    - cloudfront:CreateInvalidation
+                    - cloudfront:GetInvalidation
+                  Resource: '*'
+          - !Ref AWS::NoValue
+
+Outputs:
+  DeployRoleArn:
+    Description: IAM Role ARN for GitHub Actions (set as AWS_ROLE_ARN secret)
+    Value: !GetAtt DeployRole.Arn
+  OIDCProviderArn:
+    Description: GitHub OIDC Provider ARN
+    Value: !Ref GitHubOIDCProvider

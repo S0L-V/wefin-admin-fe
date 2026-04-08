@@ -30,5 +30,5 @@ dist-ssr
 # Claude
 CLAUDE.md
 
-# Infra (CloudFormation templates managed separately)
-infra/
+# Infra docs
+infra/DEPLOY_GUIDE.md
