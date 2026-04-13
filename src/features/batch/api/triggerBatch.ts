@@ -17,7 +17,7 @@ export async function triggerBatch(env: BatchEnv, item: BatchItem): Promise<Batc
     const response = await axios.request({
       method: item.method,
       url: `${baseUrl}${item.path}`,
-      timeout: 120_000,
+      timeout: 0,
       headers: { 'Content-Type': 'application/json' },
     })
     return { status: response.status, data: response.data }
