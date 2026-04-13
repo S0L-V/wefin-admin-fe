@@ -10,6 +10,13 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/news/articles" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
       {
+        path: 'batch',
+        lazy: () =>
+          import('@/pages/batch/BatchPage').then((m) => ({
+            Component: m.BatchPage,
+          })),
+      },
+      {
         path: 'news/articles',
         lazy: () =>
           import('@/pages/news/ArticleListPage').then((m) => ({
@@ -21,6 +28,20 @@ export const router = createBrowserRouter([
         lazy: () =>
           import('@/pages/news/ArticleDetailPage').then((m) => ({
             Component: m.ArticleDetailPage,
+          })),
+      },
+      {
+        path: 'news/clusters',
+        lazy: () =>
+          import('@/pages/cluster/ClusterListPage').then((m) => ({
+            Component: m.ClusterListPage,
+          })),
+      },
+      {
+        path: 'news/clusters/:clusterId',
+        lazy: () =>
+          import('@/pages/cluster/ClusterDetailPage').then((m) => ({
+            Component: m.ClusterDetailPage,
           })),
       },
     ],
