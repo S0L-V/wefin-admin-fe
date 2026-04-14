@@ -95,6 +95,14 @@ export const BATCH_ITEMS: BatchItem[] = [
     group: 'Market',
   },
   {
+    id: 'market-trend-trigger',
+    label: '금융 동향 생성',
+    description: '시장 지표 + 최근 24시간 뉴스 클러스터를 종합해 오늘의 금융 동향을 AI로 생성한다',
+    method: 'POST',
+    path: '/api/admin/market-trends/trigger',
+    group: 'Market',
+  },
+  {
     id: 'game-init',
     label: '게임 종목 초기화',
     description: 'CSV로부터 게임 종목 마스터를 초기화한다',
