@@ -11,6 +11,17 @@ const STATUS_VARIANT: Record<string, string> = {
   // RelevanceStatus
   FINANCIAL: 'success',
   IRRELEVANT: 'neutral',
+  // ClusterStatus
+  ACTIVE: 'success',
+  INACTIVE: 'neutral',
+  // SummaryStatus
+  GENERATED: 'success',
+  STALE: 'warning',
+  // ClusterType
+  STOCK: 'info',
+  SECTOR: 'warning',
+  TOPIC: 'success',
+  GENERAL: 'neutral',
 }
 
 interface StatusBadgeProps {
