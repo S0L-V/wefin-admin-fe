@@ -1,9 +1,10 @@
-import { Layers, ListChecks, Newspaper } from 'lucide-react'
+import { Hash, Layers, ListChecks, Newspaper } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
   { to: '/news/articles', label: '기사 관리', icon: Newspaper },
   { to: '/news/clusters', label: '클러스터 관리', icon: Layers },
+  { to: '/news/tags', label: '인기 태그', icon: Hash },
   { to: '/batch', label: '배치 관리', icon: ListChecks },
 ]
 

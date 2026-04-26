@@ -44,6 +44,13 @@ export const router = createBrowserRouter([
             Component: m.ClusterDetailPage,
           })),
       },
+      {
+        path: 'news/tags',
+        lazy: () =>
+          import('@/pages/tag/PopularTagsPage').then((m) => ({
+            Component: m.PopularTagsPage,
+          })),
+      },
     ],
   },
 ])
